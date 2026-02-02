@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem; 
 
 public class Position : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class Position : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Keyboard.current.tabKey.wasPressedThisFrame)
         {
             myLight.color = Color.magenta;
         }
