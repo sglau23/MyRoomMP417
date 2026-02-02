@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "ControllerSampleActions",
     "maps": [
         {
@@ -837,7 +838,7 @@
                     "name": "PrimaryButton",
                     "type": "Button",
                     "id": "b87d0657-0e2f-41f9-92ee-6c7f0b0fa4f8",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
