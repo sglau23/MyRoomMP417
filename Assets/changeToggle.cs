@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.XR;
+using UnityEngine.InputSystem;
 
 public class changeToggle : MonoBehaviour
 {
@@ -7,27 +8,42 @@ public class changeToggle : MonoBehaviour
     public Transform externalViewPoint;
 
     private bool isInRoom = true;
-    private bool lastPressed = false;
+    private bool lastXRPressed = false;
 
     void Update()
     {
-        InputDevice rightHand =
+        bool toggleRequested = false;
+
+        // XR CONTROLLER (B button / secondary)
+        UnityEngine.XR.InputDevice rightHand =
             InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
 
-        if (!rightHand.isValid)
-            return;
+        bool xrPressed = false;
 
-        // Button B = secondaryButton on right controller
-        if (rightHand.TryGetFeatureValue(
-            CommonUsages.secondaryButton, out bool pressed))
+        if (rightHand.isValid)
         {
-            // Edge detection (press once)
-            if (pressed && !lastPressed)
+            rightHand.TryGetFeatureValue(
+                UnityEngine.XR.CommonUsages.secondaryButton,
+                out xrPressed);
+
+            if (xrPressed && !lastXRPressed)
             {
-                ToggleView();
+                toggleRequested = true;
             }
 
-            lastPressed = pressed;
+            lastXRPressed = xrPressed;
+        }
+
+        // KEYBOARD (B key, New Input System)
+        if (Keyboard.current != null &&
+            Keyboard.current.bKey.wasPressedThisFrame)
+        {
+            toggleRequested = true;
+        }
+
+        if (toggleRequested)
+        {
+            ToggleView();
         }
     }
 
