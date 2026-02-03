@@ -7,14 +7,27 @@ public class changeToggle : MonoBehaviour
     public Transform externalViewPoint;
 
     private bool isInRoom = true;
+    private bool lastPressed = false;
 
     void Update()
     {
-        // Primary button (A / X depending on controller)
-        if (InputDevices.GetDeviceAtXRNode(XRNode.RightHand)
-            .TryGetFeatureValue(CommonUsages.primaryButton, out bool pressed) && pressed)
+        InputDevice rightHand =
+            InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+
+        if (!rightHand.isValid)
+            return;
+
+        // Button B = secondaryButton on right controller
+        if (rightHand.TryGetFeatureValue(
+            CommonUsages.secondaryButton, out bool pressed))
         {
-            ToggleView();
+            // Edge detection (press once)
+            if (pressed && !lastPressed)
+            {
+                ToggleView();
+            }
+
+            lastPressed = pressed;
         }
     }
 
@@ -22,13 +35,15 @@ public class changeToggle : MonoBehaviour
     {
         if (isInRoom)
         {
-            transform.position = externalViewPoint.position;
-            transform.rotation = externalViewPoint.rotation;
+            transform.SetPositionAndRotation(
+                externalViewPoint.position,
+                externalViewPoint.rotation);
         }
         else
         {
-            transform.position = roomViewPoint.position;
-            transform.rotation = roomViewPoint.rotation;
+            transform.SetPositionAndRotation(
+                roomViewPoint.position,
+                roomViewPoint.rotation);
         }
 
         isInRoom = !isInRoom;
