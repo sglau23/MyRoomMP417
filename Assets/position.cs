@@ -1,41 +1,27 @@
 using UnityEngine;
-using UnityEngine.XR;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.XR;
+using UnityEngine.InputSystem.Controls;
 
 public class LightToggle : MonoBehaviour
 {
     private Light myLight;
-    private bool lastPressed = false;
+    private ButtonControl primaryButton;
 
     void Start()
     {
         myLight = GetComponent<Light>();
+
+        var leftHand = InputSystem.GetDevice<XRController>(CommonUsages.LeftHand);
+        if (leftHand != null)
+        {
+            primaryButton = leftHand.TryGetChildControl<ButtonControl>("primaryButton");
+        }
     }
 
     void Update()
     {
-        // Keyboard 
-        bool keyboardPressed =
-            Keyboard.current != null &&
-            Keyboard.current.tabKey.wasPressedThisFrame;
-
-        // Quest Controller 
-        bool controllerPressed = false;
-
-        UnityEngine.XR.InputDevice rightHand =
-            InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
-
-        if (rightHand.isValid &&
-            rightHand.TryGetFeatureValue(
-                UnityEngine.XR.CommonUsages.primaryButton,
-                out bool pressed))
-        {
-            controllerPressed = pressed && !lastPressed;
-            lastPressed = pressed;
-        }
-
-        // Trigger
-        if (keyboardPressed || controllerPressed)
+        if (primaryButton != null && primaryButton.wasPressedThisFrame)
         {
             myLight.color = Color.magenta;
         }
