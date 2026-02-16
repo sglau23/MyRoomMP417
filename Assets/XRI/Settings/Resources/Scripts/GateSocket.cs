@@ -1,24 +1,32 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-public class NewEmptyCSharpScript : MonoBehaviour
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
+
+public class GateSocket : MonoBehaviour
 {
     public EscapeGameManager gameManager;
     public int gateIndex = 0;
-    UnityEngine.XR.Interaction.Toolkit.Interactors.XRSocketInteractor socket;
-    bool triggered = false;
+
+    private XRSocketInteractor socket;
+    private bool triggered = false;
+
     void Awake()
     {
-        socket = GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactors.XRSocketInteractor>();
+        socket = GetComponent<XRSocketInteractor>();
+        if (socket == null)
+            Debug.LogError("GateSocket: No XRSocketInteractor found on " + gameObject.name);
     }
 
     void OnEnable()
     {
-        socket.selectEntered.AddListener(OnSelectEntered);
+        if (socket != null)
+            socket.selectEntered.AddListener(OnSelectEntered);
     }
 
     void OnDisable()
     {
-        socket.selectEntered.RemoveListener(OnSelectEntered);
+        if (socket != null)
+            socket.selectEntered.RemoveListener(OnSelectEntered);
     }
 
     void OnSelectEntered(SelectEnterEventArgs args)
@@ -28,5 +36,8 @@ public class NewEmptyCSharpScript : MonoBehaviour
 
         if (gameManager != null)
             gameManager.MarkGateComplete(gateIndex);
+        else
+            Debug.LogError("GateSocket: gameManager not assigned on " + gameObject.name);
     }
 }
+
