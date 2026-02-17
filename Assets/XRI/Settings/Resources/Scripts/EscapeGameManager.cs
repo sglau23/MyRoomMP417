@@ -1,76 +1,182 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
+using UnityEngine.XR;
 
 public class EscapeGameManager : MonoBehaviour
 {
-    public TMP_Text statusText;           // drag your Text (TMP) here
-    public GameObject winObject;          // optional: YOU WIN canvas
-    public GameObject exitBlocker;        // optional: wall/cube to disable
-    public Transform xrOrigin;            // optional
-    public Transform winTeleportTarget;   // optional
+    [Header("UI")]
+    public TMP_Text statusText;          // Drag your TMP text here
+    public GameObject winObject;         // Optional: YOU WIN canvas (start inactive)
+    public GameObject loseObject;        // Optional: YOU LOSE canvas (start inactive)
 
-    bool[] gates = new bool[3];
+    [Header("Win / Exit")]
+    public GameObject exitBlocker;       // Optional: wall/cube to disable on win
+    public Transform xrOrigin;           // Optional: XR Origin (VR)
+    public Transform winTeleportTarget;  // Optional: teleport target on win
 
-    // Names that show up when each gate is completed
+    [Header("Timer")]
+    public float timeLimitSeconds = 180f; // 3 min default
+    private float timeRemaining;
+
+    [Header("Restart (Controller Button)")]
+    public bool allowRestartAnytime = true;  // you said anytime
+    // Quest: Left X button = CommonUsages.primaryButton on LeftHand
+    private bool restartWasPressedLastFrame = false;
+
+    private bool[] gates = new bool[3];
+    private bool gameEnded = false; // true after win or lose
+
     private readonly string[] gateNames = { "Knife", "Keycard", "Bone" };
 
     void Start()
     {
+        timeRemaining = timeLimitSeconds;
+        SetActiveSafe(winObject, false);
+        SetActiveSafe(loseObject, false);
+        UpdateStatusText();
+    }
+
+    void Update()
+    {
+        // Restart anytime (or only after end if you toggle allowRestartAnytime off)
+        if (allowRestartAnytime || gameEnded)
+        {
+            if (RestartPressedThisFrame())
+            {
+                Debug.Log("Restart pressed (Left X). Reloading scene.");
+                RestartScene();
+                return;
+            }
+        }
+
+        // If game ended, stop timer + stop updating status (except win/lose message)
+        if (gameEnded) return;
+
+        // Tick timer
+        timeRemaining -= Time.deltaTime;
+        if (timeRemaining <= 0f)
+        {
+            timeRemaining = 0f;
+            Lose();
+            return;
+        }
+
         UpdateStatusText();
     }
 
     public void MarkGateComplete(int i)
     {
+        if (gameEnded) return;
         if (i < 0 || i > 2) return;
         if (gates[i]) return;
 
         gates[i] = true;
 
-        int count = (gates[0] ? 1 : 0) + (gates[1] ? 1 : 0) + (gates[2] ? 1 : 0);
+        int count = GateCount();
         Debug.Log($"Gate complete: {gateNames[i]} ({count}/3)");
 
         UpdateStatusText();
 
-        if (count == 3) Win();
+        if (count == 3)
+            Win();
     }
 
-void UpdateStatusText()
-{
-    if (!statusText) return;
-
-    int count = (gates[0] ? 1 : 0) + (gates[1] ? 1 : 0) + (gates[2] ? 1 : 0);
-
-    // Before any gates are done, show a clean start message
-    if (count == 0)
+    void UpdateStatusText()
     {
-        statusText.text =
-            "Murder Mystery Escape Room\n" +
-            "Goal: Secure 3 pieces of evidence.\n\n" +
-            "Progress: 0/3";
-        return;
-    }
+        if (!statusText) return;
 
-    // After progress starts, show detailed status
-    statusText.text =
-        $"Evidence Logged: {(gates[0] ? "Knife ✅" : "Knife ❌")}\n" +
-        $"Access Granted:  {(gates[1] ? "Keycard ✅" : "Keycard ❌")}\n" +
-        $"Bone Logged:     {(gates[2] ? "Bone ✅" : "Bone ❌")}\n\n" +
-        $"Progress: {count}/3";
-}
+        string timerStr = FormatTime(timeRemaining);
+        int count = GateCount();
+
+        string knifeLine = gates[0] ? "Evidence Logged: Knife" : "Evidence Logged:";
+        string keycardLine = gates[1] ? "Access Granted: Keycard" : "Access Granted:";
+        string boneLine = gates[2] ? "Bone Logged: Bone" : "Bone Logged:";
+
+        // During gameplay show timer/progress
+        if (!gameEnded)
+        {
+            statusText.text =
+                "Murder Mystery Escape Room\n" +
+                "Goal: Secure 3 pieces of evidence.\n\n" +
+                $"{knifeLine}\n" +
+                $"{keycardLine}\n" +
+                $"{boneLine}\n\n" +
+                $"Progress: {count}/3\n" +
+                $"Time Left: {timerStr}\n\n" +
+                "Press X (Left) to Restart";
+        }
+    }
 
     void Win()
     {
+        if (gameEnded) return;
+        gameEnded = true;
+
         Debug.Log("YOU WIN!");
 
         if (exitBlocker) exitBlocker.SetActive(false);
-        if (winObject) winObject.SetActive(true);
+        SetActiveSafe(winObject, true);
 
-        if (statusText) statusText.text = "🎉 YOU WIN! 🎉\nAll evidence secured.";
+        if (statusText)
+            statusText.text = "🎉 YOU WIN! 🎉\nAll evidence secured.\n\nPress X (Left) to Restart.";
 
         if (xrOrigin && winTeleportTarget)
         {
             xrOrigin.position = winTeleportTarget.position;
             xrOrigin.rotation = winTeleportTarget.rotation;
         }
+    }
+
+    void Lose()
+    {
+        if (gameEnded) return;
+        gameEnded = true;
+
+        Debug.Log("YOU LOSE! Time ran out.");
+
+        SetActiveSafe(loseObject, true);
+
+        if (statusText)
+            statusText.text = "⏳ YOU LOSE! ⏳\nTime ran out.\n\nPress X (Left) to Restart.";
+    }
+
+    // --- Restart helpers ---
+
+    bool RestartPressedThisFrame()
+    {
+        InputDevice leftHand = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
+
+        bool pressedNow = false;
+        if (leftHand.isValid)
+            leftHand.TryGetFeatureValue(CommonUsages.primaryButton, out pressedNow);
+
+        bool pressedThisFrame = pressedNow && !restartWasPressedLastFrame;
+        restartWasPressedLastFrame = pressedNow;
+
+        return pressedThisFrame;
+    }
+
+    void RestartScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    int GateCount()
+    {
+        return (gates[0] ? 1 : 0) + (gates[1] ? 1 : 0) + (gates[2] ? 1 : 0);
+    }
+
+    string FormatTime(float t)
+    {
+        int seconds = Mathf.CeilToInt(t);
+        int m = seconds / 60;
+        int s = seconds % 60;
+        return $"{m:00}:{s:00}";
+    }
+
+    void SetActiveSafe(GameObject go, bool active)
+    {
+        if (go) go.SetActive(active);
     }
 }
