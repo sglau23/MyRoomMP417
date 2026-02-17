@@ -155,7 +155,7 @@ MonoBehaviour:
   m_InteractionManager: {fileID: 0}
   m_Colliders: []
   m_InteractionLayers:
-    m_Bits: 4294967295
+    m_Bits: 5
   m_DistanceCalculationMode: 1
   m_SelectMode: 0
   m_FocusMode: 1
@@ -2447,7 +2447,7 @@ Transform:
   m_GameObject: {fileID: 1236833297}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.02}
+  m_LocalPosition: {x: -0.01, y: 0, z: 0.02}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2914,6 +2914,7 @@ GameObject:
   - component: {fileID: 1399211758}
   - component: {fileID: 1399211757}
   - component: {fileID: 1399211759}
+  - component: {fileID: 1399211760}
   m_Layer: 0
   m_Name: Gate_KnifeSocket
   m_TagString: Untagged
@@ -2935,7 +2936,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.Interactors.XRSocketInteractor
   m_InteractionManager: {fileID: 0}
   m_InteractionLayers:
-    m_Bits: 0
+    m_Bits: 2
   m_Handedness: 0
   m_AttachTransform: {fileID: 1829136349}
   m_KeepSelectedTargetValid: 1
@@ -2978,7 +2979,7 @@ Transform:
   m_GameObject: {fileID: 1399211756}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.002, y: 0.85, z: -0.037}
+  m_LocalPosition: {x: 0.022, y: 0.85, z: -0.032}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3000,6 +3001,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NewEmptyCSharpScript
   gameManager: {fileID: 1517223512}
   gateIndex: 0
+--- !u!65 &1399211760
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1399211756}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: -0.04, y: 0.1, z: -0.23}
 --- !u!1 &1517223511
 GameObject:
   m_ObjectHideFlags: 0
@@ -3219,6 +3241,7 @@ GameObject:
   - component: {fileID: 1723504654}
   - component: {fileID: 1723504653}
   - component: {fileID: 1723504652}
+  - component: {fileID: 1723504655}
   m_Layer: 0
   m_Name: Gate_Keycard
   m_TagString: Untagged
@@ -3305,6 +3328,27 @@ Transform:
   - {fileID: 737946288}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &1723504655
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1723504651}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.2
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1806667985
 GameObject:
   m_ObjectHideFlags: 0
@@ -3330,7 +3374,7 @@ Transform:
   m_GameObject: {fileID: 1806667985}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.02}
+  m_LocalPosition: {x: 0.002, y: 0.02, z: -0.009}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3361,7 +3405,7 @@ Transform:
   m_GameObject: {fileID: 1829136348}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.114, z: -0.266}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3403,7 +3447,7 @@ MonoBehaviour:
   m_InteractionManager: {fileID: 0}
   m_Colliders: []
   m_InteractionLayers:
-    m_Bits: 4294967295
+    m_Bits: 3
   m_DistanceCalculationMode: 1
   m_SelectMode: 0
   m_FocusMode: 1
@@ -3631,7 +3675,7 @@ Transform:
   m_GameObject: {fileID: 1928834265}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: 0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0.055, y: 0.879, z: 0.411}
+  m_LocalPosition: {x: 0.055, y: 0.879, z: 0.702}
   m_LocalScale: {x: 0.01, y: 0.2, z: 0.01}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3649,6 +3693,7 @@ GameObject:
   - component: {fileID: 1929223255}
   - component: {fileID: 1929223254}
   - component: {fileID: 1929223253}
+  - component: {fileID: 1929223256}
   m_Layer: 0
   m_Name: Gate_Bone
   m_TagString: Untagged
@@ -3735,6 +3780,27 @@ Transform:
   - {fileID: 1383226416}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &1929223256
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1929223252}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.2
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1934578873
 GameObject:
   m_ObjectHideFlags: 0
@@ -3892,7 +3958,7 @@ MonoBehaviour:
   m_InteractionManager: {fileID: 0}
   m_Colliders: []
   m_InteractionLayers:
-    m_Bits: 4294967295
+    m_Bits: 9
   m_DistanceCalculationMode: 1
   m_SelectMode: 0
   m_FocusMode: 1
