@@ -6,28 +6,33 @@ using UnityEngine.XR;
 public class EscapeGameManager : MonoBehaviour
 {
     [Header("UI")]
-    public TMP_Text statusText;          // Drag your TMP text here
-    public GameObject winObject;         // Optional: YOU WIN canvas (start inactive)
-    public GameObject loseObject;        // Optional: YOU LOSE canvas (start inactive)
+    public TMP_Text statusText;
+    public GameObject winObject;
+    public GameObject loseObject;
 
     [Header("Win / Exit")]
-    public GameObject exitBlocker;       // Optional: wall/cube to disable on win
-    public Transform xrOrigin;           // Optional: XR Origin (VR)
-    public Transform winTeleportTarget;  // Optional: teleport target on win
+    public GameObject exitBlocker;
+    public Transform xrOrigin;
+    public Transform winTeleportTarget;
 
     [Header("Timer")]
-    public float timeLimitSeconds = 180f; // 3 min default
+    public float timeLimitSeconds = 180f;
     private float timeRemaining;
 
     [Header("Restart (Controller Button)")]
-    public bool allowRestartAnytime = true;  // you said anytime
-    // Quest: Left X button = CommonUsages.primaryButton on LeftHand
+    public bool allowRestartAnytime = true;
     private bool restartWasPressedLastFrame = false;
 
+    // ---------- EXISTING GATES ----------
     private bool[] gates = new bool[3];
-    private bool gameEnded = false; // true after win or lose
-
     private readonly string[] gateNames = { "Knife", "Keycard", "Bone" };
+
+    // ---------- NEW COLLECTIBLES ----------
+    [Header("Collectibles")]
+    public int totalCollectibles = 5;
+    private int collectedCount = 0;
+
+    private bool gameEnded = false;
 
     void Start()
     {
@@ -39,21 +44,17 @@ public class EscapeGameManager : MonoBehaviour
 
     void Update()
     {
-        // Restart anytime (or only after end if you toggle allowRestartAnytime off)
         if (allowRestartAnytime || gameEnded)
         {
             if (RestartPressedThisFrame())
             {
-                Debug.Log("Restart pressed (Left X). Reloading scene.");
                 RestartScene();
                 return;
             }
         }
 
-        // If game ended, stop timer + stop updating status (except win/lose message)
         if (gameEnded) return;
 
-        // Tick timer
         timeRemaining -= Time.deltaTime;
         if (timeRemaining <= 0f)
         {
@@ -65,6 +66,17 @@ public class EscapeGameManager : MonoBehaviour
         UpdateStatusText();
     }
 
+    // ---------- COLLECTIBLE FUNCTION ----------
+    public void CollectItem()
+    {
+        if (gameEnded) return;
+
+        collectedCount++;
+        Debug.Log($"Collected: {collectedCount}/{totalCollectibles}");
+        UpdateStatusText();
+    }
+
+    // ---------- GATE PROGRESSION ----------
     public void MarkGateComplete(int i)
     {
         if (gameEnded) return;
@@ -82,6 +94,7 @@ public class EscapeGameManager : MonoBehaviour
             Win();
     }
 
+    // ---------- UI ----------
     void UpdateStatusText()
     {
         if (!statusText) return;
@@ -93,7 +106,6 @@ public class EscapeGameManager : MonoBehaviour
         string keycardLine = gates[1] ? "Access Granted: Keycard" : "Access Granted:";
         string boneLine = gates[2] ? "Bone Logged: Bone" : "Bone Logged:";
 
-        // During gameplay show timer/progress
         if (!gameEnded)
         {
             statusText.text =
@@ -103,17 +115,17 @@ public class EscapeGameManager : MonoBehaviour
                 $"{keycardLine}\n" +
                 $"{boneLine}\n\n" +
                 $"Progress: {count}/3\n" +
+                $"Collectibles: {collectedCount}/{totalCollectibles}\n" +
                 $"Time Left: {timerStr}\n\n" +
                 "Press X (Left) to Restart";
         }
     }
 
+    // ---------- WIN / LOSE ----------
     void Win()
     {
         if (gameEnded) return;
         gameEnded = true;
-
-        Debug.Log("YOU WIN!");
 
         if (exitBlocker) exitBlocker.SetActive(false);
         SetActiveSafe(winObject, true);
@@ -133,16 +145,13 @@ public class EscapeGameManager : MonoBehaviour
         if (gameEnded) return;
         gameEnded = true;
 
-        Debug.Log("YOU LOSE! Time ran out.");
-
         SetActiveSafe(loseObject, true);
 
         if (statusText)
             statusText.text = "⏳ YOU LOSE! ⏳\nTime ran out.\n\nPress X (Left) to Restart.";
     }
 
-    // --- Restart helpers ---
-
+    // ---------- RESTART ----------
     bool RestartPressedThisFrame()
     {
         InputDevice leftHand = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
@@ -162,6 +171,7 @@ public class EscapeGameManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
+    // ---------- HELPERS ----------
     int GateCount()
     {
         return (gates[0] ? 1 : 0) + (gates[1] ? 1 : 0) + (gates[2] ? 1 : 0);
