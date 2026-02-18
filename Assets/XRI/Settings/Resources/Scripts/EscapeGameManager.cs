@@ -26,11 +26,14 @@ public class EscapeGameManager : MonoBehaviour
     // ---------- EXISTING GATES ----------
     private bool[] gates = new bool[3];
     private readonly string[] gateNames = { "Knife", "Keycard", "Bone" };
+    
 
     // ---------- NEW COLLECTIBLES ----------
     [Header("Collectibles")]
     public int totalCollectibles = 5;
     private int collectedCount = 0;
+    // Light flashers
+    public WinLightFlasher winLightFlasher;
 
     private bool gameEnded = false;
 
@@ -124,6 +127,9 @@ public class EscapeGameManager : MonoBehaviour
     // ---------- WIN / LOSE ----------
     void Win()
     {
+        if (winLightFlasher != null)
+        winLightFlasher.StartFlashing();
+
         if (gameEnded) return;
         gameEnded = true;
 
